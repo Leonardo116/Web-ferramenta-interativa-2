@@ -1,0 +1,144 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const studyCard = document.getElementById('study-card');
+    const questionInput = document.getElementById('question-input');
+    const answerInput = document.getElementById('answer-input');
+    const addCardBtn = document.getElementById('add-card-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const flipBtn = document.getElementById('flip-btn');
+    const loadSampleBtn = document.getElementById('load-sample');
+    const clearAllBtn = document.getElementById('clear-all');
+    const currentCardSpan = document.getElementById('current-card');
+    const totalCardsSpan = document.getElementById('total-cards');
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    
+    let cards = [];
+    let currentCardIndex = 0;
+    let isFlipped = false;
+    let currentMode = 'flashcards';
+    
+    // Inicializa a ferramenta
+    function init() {
+        updateCardDisplay();
+        updateControls();
+    }
+    
+    // Adiciona um novo cartão
+    function addCard(question, answer) {
+        if (question.trim() === '' || answer.trim() === '') {
+            alert('Por favor, preencha tanto a pergunta quanto a resposta.');
+            return;
+        }
+        
+        cards.push({ question, answer });
+        questionInput.value = '';
+        answerInput.value = '';
+        currentCardIndex = cards.length - 1;
+        isFlipped = false;
+        
+        updateCardDisplay();
+        updateControls();
+    }
+    
+    // Atualiza a exibição do cartão atual
+    function updateCardDisplay() {
+        if (cards.length === 0) {
+            studyCard.textContent = 'Clique em "Adicionar Cartão" para começar ou "Carregar Exemplo" para ver uma demonstração.';
+            return;
+        }
+        
+        const card = cards[currentCardIndex];
+        studyCard.textContent = isFlipped ? card.answer : card.question;
+        currentCardSpan.textContent = currentCardIndex + 1;
+        totalCardsSpan.textContent = cards.length;
+    }
+    
+    // Atualiza o estado dos botões de controle
+    function updateControls() {
+        prevBtn.disabled = currentCardIndex === 0 || cards.length === 0;
+        nextBtn.disabled = currentCardIndex === cards.length - 1 || cards.length === 0;
+        flipBtn.disabled = cards.length === 0;
+    }
+    
+    // Carrega cartões de exemplo
+    function loadSampleCards() {
+        const sampleCards = [
+            {
+                question: "Qual é a capital do Brasil?",
+                answer: "Brasília"
+            },
+            {
+                question: "Quem escreveu 'Dom Quixote'?",
+                answer: "Miguel de Cervantes"
+            },
+            {
+                question: "Quantos planetas existem no sistema solar?",
+                answer: "8 (Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano e Netuno)"
+            }
+        ];
+        
+        cards = sampleCards;
+        currentCardIndex = 0;
+        isFlipped = false;
+        
+        updateCardDisplay();
+        updateControls();
+    }
+    
+    // Limpa todos os cartões
+    function clearAllCards() {
+        if (cards.length === 0 || confirm('Tem certeza que deseja remover todos os cartões?')) {
+            cards = [];
+            currentCardIndex = 0;
+            isFlipped = false;
+            
+            updateCardDisplay();
+            updateControls();
+        }
+    }
+    
+    // Event listeners
+    addCardBtn.addEventListener('click', () => {
+        addCard(questionInput.value, answerInput.value);
+    });
+    
+    prevBtn.addEventListener('click', () => {
+        if (currentCardIndex > 0) {
+            currentCardIndex--;
+            isFlipped = false;
+            updateCardDisplay();
+            updateControls();
+        }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (currentCardIndex < cards.length - 1) {
+            currentCardIndex++;
+            isFlipped = false;
+            updateCardDisplay();
+            updateControls();
+        }
+    });
+    
+    flipBtn.addEventListener('click', () => {
+        if (cards.length > 0) {
+            isFlipped = !isFlipped;
+            updateCardDisplay();
+        }
+    });
+    
+    loadSampleBtn.addEventListener('click', loadSampleCards);
+    clearAllBtn.addEventListener('click', clearAllCards);
+    
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = btn.dataset.mode;
+            alert(`Modo alterado para: ${btn.textContent}. Esta funcionalidade pode ser expandida.`);
+        });
+    });
+    
+    // Inicializa a aplicação
+    init();
+});
